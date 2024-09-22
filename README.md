@@ -24,7 +24,7 @@ The Next.js Chatbot Project showcases different approaches to building chatbots 
 
 ### Prerequisites
 
-- **Node.js**: Make sure you have Node.js installed (v14+ recommended).
+- **Node.js**: Make sure you have Node.js installed (v20+ recommended).
 - **npm**: Node package manager, which is required for installing dependencies.
 
 ### Installation
@@ -32,26 +32,30 @@ The Next.js Chatbot Project showcases different approaches to building chatbots 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/seungmanchoi/langchain-nextjs.git
+   cd langchain-nextjs
+   ```
 
 2. Install dependencies:
 
    ```bash
    npm install
+   ```
    
 3. Set up environment variables:
 
    ```bash
    MODEL=your_model_name(openai, gemini)
+   ```
    
 ### Running the Project
 To start the development server:
-    
-    ```bash
-    npm run dev
 
-Navigate to http://localhost:3000 to see the application in action.
+   ```bash
+   npm run dev
+   ```
+
+Navigate to http://localhost:3000/bot to see the application in action.
 
 ## Example Implementations
 ### 1. Simple Chatbot
