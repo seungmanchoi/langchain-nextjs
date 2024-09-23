@@ -10,7 +10,7 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
 // 스플릿된 청크 문자열을 백터화한 백터데이터를 저장하기 위한 저장소로 [메모리 전용 백터 저장소]
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { ChatOpenAI, OpenAIEmbeddings } from '@langchain/openai';
+import { OpenAIEmbeddings } from '@langchain/openai';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 // langchain/hub를 통해 공유된 rag전용 프롬프트 템플릿 참조 생성하기
@@ -19,6 +19,7 @@ import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
 
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { EUserType, IMemberMessage } from '@/interfaces/message';
+import { createLLMModel, EModelName } from '@/utils/common';
 
 // 백엔드에서 프론트엔드로 전달할 결과 데이터 정의하기
 type ResponseData = {
@@ -67,18 +68,14 @@ export default async function handler(
       const retrieverResult = await retriever.invoke(message);
 
       // Step3:RAG 기반(증강된 검색데이터를 통한) LLM 호출하기
-      const gptModel = new ChatOpenAI({
-        model: 'gpt-4o',
-        temperature: 0.2,
-        apiKey: process.env.OPENAI_API_KEY,
-      });
+      const model = createLLMModel(process.env.MODEL as EModelName);
 
       //rag전용 프롬프트 템플릿 생성
       const ragPrompt = await pull<ChatPromptTemplate>('rlm/rag-prompt');
 
       // rag전용 프롬프트 기반 체인 생성하기
       const ragChain = await createStuffDocumentsChain({
-        llm: gptModel,
+        llm: model!,
         prompt: ragPrompt,
         outputParser: new StringOutputParser(),
       });

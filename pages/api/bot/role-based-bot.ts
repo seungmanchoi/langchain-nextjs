@@ -1,33 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ChatOpenAI } from '@langchain/openai';
-import { EUserType, IMemberMessage } from '@/interfaces/message';
+import { EUserType, ResponseData } from '@/interfaces/message';
 
 // SystemMessage: LLM 챗봇에게 역학을 지정할때 사용
 // HumanMessage: LLM 챗봇에게 전달할 사용자 메시지 타입
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
-
-// 백엔드에서 프론트엔드로 전달할 결과 데이터 정의하기
-type ResponseData = {
-  code: number;
-  data: IMemberMessage | null;
-  msg: string;
-};
-
-enum EModelName {
-  OPENAI = 'openai',
-  GEMINI = 'gemini',
-}
-
-const createLLMModel = (model: EModelName) => {
-  if (model === EModelName.OPENAI) {
-    const llm = new ChatOpenAI({
-      model: 'gpt-4o',
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    return llm;
-  }
-};
+import { createLLMModel, EModelName } from '@/utils/common';
 
 // 백엔드 REST API 기능을 제공해주는 처리함수 구현하기
 // req는 클라이언트에서 서버로 제공되는 각종정보를 포함하는 매개변수이고 타입은 NextApiRequest이다.

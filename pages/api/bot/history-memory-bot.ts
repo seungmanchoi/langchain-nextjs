@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ChatOpenAI } from '@langchain/openai';
-import { EUserType, IMemberMessage } from '@/interfaces/message';
+import { EUserType, ResponseData } from '@/interfaces/message';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 //LLM 응답메시지 타입을 원하는 타입결과물로 파싱(변환)해주는 아웃풋파서참조하기
@@ -14,29 +13,7 @@ import { InMemoryChatMessageHistory } from '@langchain/core/chat_history';
 
 //대화이력 관리를 위한 세부 주요 객체 참조하기
 import { RunnableWithMessageHistory } from '@langchain/core/runnables';
-
-// 백엔드에서 프론트엔드로 전달할 결과 데이터 정의하기
-type ResponseData = {
-  code: number;
-  data: IMemberMessage | null;
-  msg: string;
-};
-
-enum EModelName {
-  OPENAI = 'openai',
-  GEMINI = 'gemini',
-}
-
-const createLLMModel = (model: EModelName) => {
-  if (model === EModelName.OPENAI) {
-    const llm = new ChatOpenAI({
-      model: 'gpt-4o',
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    return llm;
-  }
-};
+import { createLLMModel, EModelName } from '@/utils/common';
 
 //메모리 영역에 실제 대화이력이  저장되는 전역변수 선언 및 구조정의
 //Record<string:사용자세션아이디, InMemoryChatMessageHistory:사용자별대화이력객체>
