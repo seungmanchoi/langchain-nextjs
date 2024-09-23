@@ -1,4 +1,5 @@
 import { ChatOpenAI } from '@langchain/openai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 
 export enum EModelName {
   OPENAI = 'openai',
@@ -7,12 +8,15 @@ export enum EModelName {
 
 export const createLLMModel = (model: EModelName) => {
   if (model === EModelName.OPENAI) {
-    const llm = new ChatOpenAI({
+    return new ChatOpenAI({
       model: 'gpt-4o',
       // temperature: 0.2,
       apiKey: process.env.OPENAI_API_KEY,
     });
-
-    return llm;
+  } else if (model === EModelName.GEMINI) {
+    return new ChatGoogleGenerativeAI({
+      model: 'gemini-pro',
+      apiKey: process.env.GEMINI_API_KEY,
+    });
   }
 };

@@ -16,6 +16,7 @@ export default async function handler(
       // LLM 모델 생성
       const llm = createLLMModel(process.env.MODEL as EModelName);
 
+      console.log('llm', llm);
       // Case1: 심플 챗봇 (질문 응답)
       const result = await llm!.invoke(message);
       const apiResult = {
@@ -35,7 +36,8 @@ export default async function handler(
         .status(405)
         .json({ code: 405, data: null, msg: 'Method Not Allowed' });
     }
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ code: 500, data: null, msg: 'failed' });
   }
 }

@@ -86,7 +86,8 @@ export default async function handler(
         .status(405)
         .json({ code: 405, data: null, msg: 'Method Not Allowed' });
     }
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ code: 500, data: null, msg: 'failed' });
   }
 }
