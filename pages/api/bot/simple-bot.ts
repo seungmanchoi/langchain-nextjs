@@ -16,7 +16,6 @@ export default async function handler(
       // LLM 모델 생성
       const llm = createLLMModel(process.env.MODEL as EModelName);
 
-      console.log('llm', llm);
       // Case1: 심플 챗봇 (질문 응답)
       const result = await llm!.invoke(message);
       const apiResult = {
