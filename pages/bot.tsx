@@ -4,7 +4,7 @@ import { remark } from 'remark';
 import html from 'remark-html';
 
 const Bot = () => {
-  const [nickName, setNickName] = useState<string>('You');
+  const [nickName] = useState<string>('You');
   const [message, setMessage] = useState<string>('');
   const [messageList, setMessageList] = useState<IMemberMessage[]>([
     {

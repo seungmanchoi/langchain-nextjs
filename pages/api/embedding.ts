@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+// import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
 import { createEmbeddingModel } from '@/utils/common';
 import { EUserType } from '@/interfaces/message';
