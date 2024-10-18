@@ -15,6 +15,7 @@
     "@langchain/openai": "^0.3.0",
     "axios": "^1.7.7",
     "cheerio": "^1.0.0",
+    "chromadb": "^1.9.2",
     "dayjs": "^1.11.13",
     "langchain": "^0.3.2",
     "next": "14.2.13",

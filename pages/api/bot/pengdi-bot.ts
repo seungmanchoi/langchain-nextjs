@@ -5,30 +5,12 @@ import {
   createLLMModel,
   EModelName,
 } from '@/utils/common';
-import axios from 'axios';
+
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { RunnableWithMessageHistory } from '@langchain/core/runnables';
 import { InMemoryChatMessageHistory } from '@langchain/core/chat_history';
+import { EUserType, ResponseData } from '@/interfaces/message';
 // import { Chroma } from '@langchain/community/vectorstores/chroma';
-
-async function sendMessageToSlack(channel: string, text: string) {
-  try {
-    await axios.post(
-      'https://slack.com/api/chat.postMessage',
-      {
-        channel: channel,
-        text: text,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`, // Slack Bot User OAuth Token
-        },
-      },
-    );
-  } catch (error) {
-    console.error('Error sending message to Slack:', error);
-  }
-}
 
 // 메모리 영역에 실제 대화이력이 저장되는 전역변수 선언 및 구조정의
 const messageHistories: Record<string, InMemoryChatMessageHistory> = {};
@@ -46,44 +28,13 @@ const MAX_MESSAGES_PER_CHANNEL = 20;
 // req는 클라이언트에서 서버로 제공되는 각종정보를 포함하는 매개변수이고 타입은 NextApiRequest이다.
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<string>,
+  res: NextApiResponse<ResponseData>,
 ) {
   try {
     // 클라이언트에서 서버로 전달된 데이터를 가져오기
-    const { event } = req.body;
+    if (req.method?.toUpperCase() === 'POST') {
+      const { message, user } = req.body;
 
-    if (req.body.type === 'url_verification') {
-      // Slack이 보낸 challenge 값을 그대로 응답
-      return res.status(200).send(req.body.challenge);
-    }
-
-    // Slack의 재시도 요청 확인 및 처리 방지
-    const retryNum = req.headers['x-slack-retry-num'];
-    if (retryNum) {
-      console.log(`Slack Retry Attempt: ${retryNum}`);
-      return res.status(200).send('OK');
-    }
-
-    if (event && event.type === 'app_mention') {
-      const message = event.text.replace(/<[^>]*>/g, ''); // 사용자가 보낸 메시지
-      const channel = event.channel; // 메시지가 발생한 채널
-      const user = event.user; // 메시지를 보낸 사용자 ID
-
-      // 메시지를 임베딩합니다.
-      // const queryEmbedding = await embeddings.embedQuery(message);
-      // const relevantDocs = await vectorStore.similaritySearchVectorWithScore(
-      //   queryEmbedding,
-      //   5,
-      // );
-
-      // const context = relevantDocs.map((doc) => doc.pageContent).join('\n\n');
-      // const context = relevantDocs
-      //   .map(([doc, score]) => {
-      //     return doc.metadata.text;
-      //   })
-      //   .join('\n\n');
-
-      // LLM 모델 생성
       const llm = createLLMModel(process.env.MODEL as EModelName);
 
       // Case3: 프롬프트 템플릿을 이용한 메시지 전달하고 응답하기
@@ -91,7 +42,7 @@ export default async function handler(
       const promptTemplate = ChatPromptTemplate.fromMessages([
         {
           type: 'system',
-          content: prompt, //.replace('{{context}}', context),
+          content: prompt,
         },
         ['placeholder', '{chat_history}'],
         ['human', '{input}'],
@@ -103,7 +54,7 @@ export default async function handler(
       const historyChain = new RunnableWithMessageHistory({
         runnable: chains,
         getMessageHistory: async (sessionId) => {
-          const historyKey = `${channel}_${sessionId}`;
+          const historyKey = `${sessionId}`;
           if (!messageHistories[historyKey]) {
             messageHistories[historyKey] = new InMemoryChatMessageHistory();
           }
@@ -131,13 +82,25 @@ export default async function handler(
 
       const result = await historyChain.invoke({ input: message }, config);
 
-      await sendMessageToSlack(channel, result);
+      const apiResult = {
+        code: 200,
+        data: {
+          userType: EUserType.BOT,
+          message: result as string,
+          sendDate: new Date(),
+        },
+        msg: 'success',
+      };
 
       // 서버에서 클라이언트로 전달할 데이터를 전달하기
-      return res.status(200).send('success');
+      res.status(200).json(apiResult);
+    } else {
+      res
+        .status(405)
+        .json({ code: 405, data: null, msg: 'Method Not Allowed' });
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).send('failed');
+    res.status(500).json({ code: 500, data: null, msg: 'failed' });
   }
 }

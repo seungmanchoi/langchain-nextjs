@@ -55,7 +55,7 @@ export default async function handler(
       const splitedDoc = await textSplitter.splitDocuments(docs);
 
       // Step1-3 : 임베딩처리(split된 단어를 벡터 데이터화 처리)하고 벡터저장소에 저장하기
-      //임베딩시에는 반드시 지정된 임베딩 모델을 통해 임베딩처리합니다.
+      // 임베딩시에는 반드시 지정된 임베딩 모델을 통해 임베딩처리합니다.
       const vectorStore = await MemoryVectorStore.fromDocuments(
         splitedDoc,
         new OpenAIEmbeddings(),

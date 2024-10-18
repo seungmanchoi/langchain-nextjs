@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { EUserType, IMemberMessage } from '@/interfaces/message';
-import dayjs from 'dayjs';
 import { remark } from 'remark';
 import html from 'remark-html';
 
@@ -14,9 +13,28 @@ const Bot = () => {
       sendDate: new Date(),
     },
   ]);
-  const [apiUri, setApiUri] = useState<string>('/api/bot/simple-bot');
+  const [apiUri, setApiUri] = useState<string>('/api/bot/pengdi-bot');
 
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const generateRandomString = (length: number) => {
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+  const [user, setUser] = useState<string>('');
+
+  useEffect(() => {
+    // 브라우저 환경에서만 실행됨
+    const storedUser =
+      localStorage.getItem('userId') || generateRandomString(10);
+    localStorage.setItem('userId', storedUser);
+    setUser(storedUser);
+  }, []);
 
   useEffect(() => {
     if (messageEndRef.current) {
@@ -55,6 +73,7 @@ const Bot = () => {
       body: JSON.stringify({
         nickName,
         message,
+        user,
       }),
     });
 
@@ -145,32 +164,25 @@ const Bot = () => {
                     setApiUri(e.target.value);
                   }}
                 >
-                  <option value="/api/bot/simple-bot">Simple bot</option>
-                  <option value="/api/bot/role-based-bot">
-                    Role based bot(영어로 번역)
-                  </option>
-                  <option value="/api/bot/prompt-template-bot">
-                    Prompt Template bot(일어로 번역)
-                  </option>
-                  <option value="/api/bot/history-memory-bot">
-                    History memory bot(대화 기억)
-                  </option>
-                  <option value="/api/bot/qna-bot">
-                    RAG QnA bot(NCloud API)
-                  </option>
+                  <option value="/api/bot/pengdi-bot">펭디</option>
+                  {/*<option value="/api/bot/simple-bot">Simple bot</option>*/}
+                  {/*<option value="/api/bot/role-based-bot">*/}
+                  {/*  Role based bot(영어로 번역)*/}
+                  {/*</option>*/}
+                  {/*<option value="/api/bot/prompt-template-bot">*/}
+                  {/*  Prompt Template bot(일어로 번역)*/}
+                  {/*</option>*/}
+                  {/*<option value="/api/bot/history-memory-bot">*/}
+                  {/*  History memory bot(대화 기억)*/}
+                  {/*</option>*/}
+                  {/*<option value="/api/bot/qna-bot">*/}
+                  {/*  RAG QnA bot(NCloud API)*/}
+                  {/*</option>*/}
                 </select>
               </div>
 
               <div className="flex-grow w-full sm:ml-4">
                 <div className="flex flex-col sm:flex-row w-full space-y-4 sm:space-y-0 sm:space-x-2">
-                  <input
-                    type="text"
-                    value={nickName}
-                    onChange={(e) => setNickName(e.target.value)}
-                    placeholder="닉네임"
-                    className="flex w-full sm:w-[80px] border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
-                  />
-
                   <input
                     type="text"
                     onChange={(e) => {
