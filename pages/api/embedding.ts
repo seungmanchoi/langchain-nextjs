@@ -51,28 +51,29 @@ async function getChromaCollection(collectionName: string) {
         },
       });
     } catch (error) {
+      throw error;
       // 컬렉션이 없거나 다른 오류 발생 시
-      if (error.message.includes('does not exist')) {
-        console.log(
-          `Collection "${collectionName}" does not exist. Creating it.`,
-        );
-        collection = await chroma.createCollection({
-          name: collectionName,
-          embeddingFunction: {
-            generate: async (texts: string[]): Promise<number[][]> => {
-              const results = [];
-              for (const text of texts) {
-                const embedding = await embeddings.embedQuery(text);
-                results.push(embedding);
-              }
-              return results;
-            },
-          },
-        });
-      } else {
-        // 다른 오류는 그대로 던짐
-        throw error;
-      }
+      // if (error.message.includes('does not exist')) {
+      //   console.log(
+      //     `Collection "${collectionName}" does not exist. Creating it.`,
+      //   );
+      //   collection = await chroma.createCollection({
+      //     name: collectionName,
+      //     embeddingFunction: {
+      //       generate: async (texts: string[]): Promise<number[][]> => {
+      //         const results = [];
+      //         for (const text of texts) {
+      //           const embedding = await embeddings.embedQuery(text);
+      //           results.push(embedding);
+      //         }
+      //         return results;
+      //       },
+      //     },
+      //   });
+      // } else {
+      //   // 다른 오류는 그대로 던짐
+      //   throw error;
+      // }
     }
 
     return collection;
