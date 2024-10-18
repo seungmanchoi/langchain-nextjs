@@ -14,13 +14,7 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"]
-    },
-    "@typescript-eslint/ban-ts-comment": [
-      "error",
-      {
-        "ts-expect-error": true
-      }
-    ]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
